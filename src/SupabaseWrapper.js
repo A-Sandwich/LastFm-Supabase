@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 const supabase_url = process.env.supabase_url;
 const default_service_role_key = process.env.default_service_role_key;
 
-export  function CreateSupabaseClient(url, service_role_key) {
+export  function create_supabase_client(url, service_role_key) {
     if (url == null) {
         url = supabase_url
     }
@@ -18,4 +18,10 @@ export  function CreateSupabaseClient(url, service_role_key) {
           detectSessionInUrl: false
         }
     })
+}
+
+export const insert_tracks = async (tracks) => {
+    let supabase = create_supabase_client()
+    const { data, error } = await supabase.from('Tracks').insert(tracks)
+    console.log(tracks, data, error)
 }

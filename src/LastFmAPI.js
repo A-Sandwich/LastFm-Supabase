@@ -2,7 +2,7 @@ import { Client } from 'node-rest-client';
 
 class LastFMApi{
     url = ""
-    default_user = process.env.last_fm_user
+    last_fm_user = process.env.last_fm_user
     last_event_epoch_time = null
 
     constructor(last_event_epoch_time) {
@@ -14,8 +14,8 @@ class LastFMApi{
         return this;
     }
     
-    user = (user) => {
-        this.url = `${this.format_url_for_query_param(this.url)}user=${user}`;
+    user = (last_fm_user) => {
+        this.url = `${this.format_url_for_query_param(this.url)}user=${last_fm_user}`;
         return this;
     }
     
@@ -59,7 +59,7 @@ class LastFMApi{
 
     returnUrl = () => this.url
     get_recent_tracks_url = () => {
-        return this.base_url().method().user().api_key().json_format().now_playing().returnUrl()
+        return this.base_url().method().user(this.last_fm_user).api_key().json_format().now_playing().returnUrl()
     }
 }
 
@@ -68,7 +68,7 @@ export async function getRecentTracks(last_epoch_event_time) {
     const last_fm = new LastFMApi(last_epoch_event_time)
     let request = new Promise((resolve, reject) => {
         client.get(last_fm.get_recent_tracks_url(), function (data, response) {
-            resolve(data.recenttracks);
+            resolve(data.recenttracks.track);
         });
     });
     return request.then((data) => {
