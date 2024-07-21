@@ -1,7 +1,7 @@
 import { get_most_recent_track, get_most_recent_track_with_date } from './FetchData.js'
 import { getRecentTracks } from './LastFmAPI.js'
 
-export function sync_tracks(){
+export async function sync_tracks(){
     // get most recent tracks
     const most_recent_track = get_most_recent_track()
     const most_recent_track_with_date = get_most_recent_track_with_date()
@@ -14,7 +14,7 @@ export function sync_tracks(){
         starting_epoch_time = most_recent_track_with_date.date
     }
 
-    let recent_tracks = getRecentTracks(starting_epoch_time)
+    let recent_tracks = await getRecentTracks(starting_epoch_time)
     console.log("🚨", recent_tracks)
 
     // parse difference

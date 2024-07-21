@@ -66,12 +66,12 @@ class LastFMApi{
 export async function getRecentTracks(last_epoch_event_time) {
     var client = new Client();
     const last_fm = new LastFMApi(last_epoch_event_time)
-    // direct way
-    client.get(last_fm.get_recent_tracks_url(), function (data, response) {
-        // parsed response body as js object
-        // console.log(data);
-        console.log("🙃", data.recenttracks.track[0])
-        // raw response
-        // console.log(response);
+    let request = new Promise((resolve, reject) => {
+        client.get(last_fm.get_recent_tracks_url(), function (data, response) {
+            resolve(data.recenttracks);
+        });
     });
+    return request.then((data) => {
+        return data
+    })
 }
