@@ -1,4 +1,5 @@
 import { Client } from 'node-rest-client';
+import { sleep } from './SleepUtil.js';
 
 class LastFMApi{
     url = ""
@@ -56,22 +57,77 @@ class LastFMApi{
         this.url = `${this.format_url_for_query_param(this.url)}nowplaying=true`;
         return this
     }
+    from = (epoch_time) => {
+        if (epoch_time == null || epoch_time == undefined)
+            epoch_time = 0
+        this.url = `${this.format_url_for_query_param(this.url)}from=${epoch_time}`;
+        return this
+    }
 
     returnUrl = () => this.url
     get_recent_tracks_url = () => {
         return this.base_url().method().user(this.last_fm_user).api_key().json_format().now_playing().returnUrl()
     }
+    get_recent_tracks_with_paging_url = (page, epoch_start_time) => {
+        return this.base_url().method().user(this.last_fm_user).api_key().json_format().now_playing().page(page).from(epoch_start_time).returnUrl()
+    }
+    page = (page) => {
+        this.url = `${this.format_url_for_query_param(this.url)}page=${page}`;
+        return this
+    }
 }
 
-export async function getRecentTracks(last_epoch_event_time) {
+class SyncState {
+    page = 1
+    page_count = 2
+    all_tracks = []
+    errors = []
+
+    push_error = (error_message) => {
+        console.log(`Error: ${error_message}`)
+        this.errors.push({
+            "page": this.page,
+            "error": error_message,
+            "url": this.url
+        })
+    }
+}
+
+export const get_all_tracks_after_epoch = async (epoch_time) => {
     var client = new Client();
-    const last_fm = new LastFMApi(last_epoch_event_time)
-    let request = new Promise((resolve, reject) => {
-        client.get(last_fm.get_recent_tracks_url(), function (data, response) {
-            resolve(data.recenttracks.track);
+    const last_fm = new LastFMApi()
+    let sync_state = new SyncState()
+    while (sync_state.page <= sync_state.page_count){
+        try {
+            let request = generate_recent_track_request(client, last_fm, sync_state.page, epoch_time)
+            sync_state = await process_request(request, sync_state)
+            await sleep(125)
+        } catch (error) {
+            sync_state.push_error(error)
+        }
+    }
+    console.log(`Errors: ${JSON.stringify(sync_state.errors)}`)
+    return sync_state.all_tracks
+}
+
+const process_request = async (request, sync_state) => {
+    await request.then((data, raw_data) => {
+        if (data !== undefined) {
+            console.log(`Processed page ${sync_state.page} of ${sync_state.page_count}. ${sync_state.errors.length} errors.`)
+            sync_state.all_tracks = sync_state.all_tracks.concat(data.track)
+            sync_state.page_count = Number(data["@attr"].totalPages)
+            sync_state.page += 1
+        } else {
+            sync_state.push_error(`Potential error: ${raw_data}`)  
+        }
+    })
+    return sync_state
+}
+
+const generate_recent_track_request = async (client, last_fm, page, epoch_time) => {
+    return new Promise((resolve, _) => {
+        client.get(last_fm.get_recent_tracks_with_paging_url(page, epoch_time), function (data, _) {
+            resolve(data.recenttracks, data);
         });
     });
-    return request.then((data) => {
-        return data
-    })
 }

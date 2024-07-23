@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 const supabase_url = process.env.supabase_url;
 const default_service_role_key = process.env.default_service_role_key;
 
-export  function create_supabase_client(url, service_role_key) {
+export  const create_supabase_client = (url, service_role_key) => {
     if (url == null) {
         url = supabase_url
     }

@@ -19,7 +19,7 @@ export const get_most_recent_track_with_date = async () => {
     const { data, error } = await supabase
     .from('Tracks')
     .select('date')
-    .order('id', {ascending: false})
+    .order('date', {ascending: false})
     .not('date', 'is', null)
     .limit(1)
     if (error) {
