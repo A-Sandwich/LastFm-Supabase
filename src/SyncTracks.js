@@ -3,6 +3,7 @@ import { get_all_tracks_after_epoch } from './LastFmAPI.js'
 import { insert_tracks } from './SupabaseWrapper.js'
 
 export const sync_tracks = async () => {
+    console.log(`Starting sync at ${new Date().toISOString()}`)
     const most_recent_track_with_date = await get_most_recent_track_with_date()
     const starting_epoch_time =  most_recent_track_with_date.at(0)?.date ?? 0
     
@@ -11,7 +12,7 @@ export const sync_tracks = async () => {
 
     // persist data
     insert_tracks(insertable_tracks)
-    // sleep / terminate
+    console.log(`Sync completed at ${new Date().toISOString()}`)
 }
 
 
@@ -32,11 +33,9 @@ const get_insertable_tracks = (tracks, starting_epoch_time) => {
 }
 
 const compare_track_data = (track1, track2) => {
-    if (track1?.date?.uts === undefined) {
-        return false
+    if (track1?.date?.uts === undefined || track2?.date?.uts === undefined) {
+        return 0
     }
-    if (track2?.date?.uts === undefined) {
-        return true
-    }
-    return Number(track1.date.uts) > Number(track2.date.uts)
+    
+    return Number(track1.date.uts) - Number(track2.date.uts)
 }

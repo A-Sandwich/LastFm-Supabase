@@ -79,7 +79,7 @@ class LastFMApi{
 
 class SyncState {
     page = 1
-    page_count = 2
+    page_count = 1
     all_tracks = []
     errors = []
 
