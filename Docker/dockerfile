@@ -1,0 +1,12 @@
+FROM ubuntu
+
+LABEL maintainer="Kyle Burkholder"
+RUN apt-get update
+RUN apt-get install -y git
+RUN apt-get install -y npm
+RUN apt-get install -y nodejs
+RUN git clone https://github.com/A-Sandwich/LastFm-Supabase.git /usr/app/LastFm-Supabase
+RUN cd /usr/app/LastFm-Supabase
+WORKDIR /usr/app/LastFm-Supabase
+RUN npm install -r package.json
+CMD ["node", "/usr/app/LastFm-Supabase/app.js"]
