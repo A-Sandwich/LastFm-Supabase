@@ -69,7 +69,7 @@ class LastFMApi{
         return this.base_url().method().user(this.last_fm_user).api_key().json_format().now_playing().returnUrl()
     }
     get_recent_tracks_with_paging_url = (page, epoch_start_time) => {
-        return this.base_url().method().user(this.last_fm_user).api_key().json_format().now_playing().page(page).from(epoch_start_time).returnUrl()
+        return this.base_url().method().user(this.last_fm_user).api_key().json_format().page(page).from(epoch_start_time).returnUrl()
     }
     page = (page) => {
         this.url = `${this.format_url_for_query_param(this.url)}page=${page}`;
