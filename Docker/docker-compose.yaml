@@ -1,0 +1,10 @@
+version: '3'
+services:
+  lastfm:
+    environment:
+      - last_fm_api_key=$last_fm_api_key
+      - last_fm_user=$last_fm_user
+      - supabase_url=$supabase_url
+      - default_service_role_key=$default_service_role_key
+      - starting_page_count=$starting_page_count
+    image: last-fm:latest
