@@ -26,7 +26,7 @@ const get_insertable_tracks = (tracks, starting_epoch_time) => {
             "artist": track.artist["#text"],
             "album": track.album["#text"],
             "name": track.name,
-            "date": Number(track.date.uts),
+            "date": Number(track.date?.uts ?? Date.now()),
             "album_art_url": track.image[0]["#text"],
         }
     })
