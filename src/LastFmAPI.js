@@ -106,7 +106,7 @@ export const get_all_tracks_after_epoch = async (epoch_time) => {
             sync_state.push_error(error)
         }
     }
-    console.log(`Errors: ${JSON.stringify(sync_state.errors)}`)
+    
     return sync_state.all_tracks
 }
 
